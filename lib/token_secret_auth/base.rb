@@ -2,12 +2,9 @@ module TokenSecretAuth
   class << self
     require 'hashids'
     # salt for the id ONLY,
-    # optional config - even if unset the only leak is the id
+    # optional config - even if user doesn't change this
+    #   the only possible leak is the id
     DEFAULT_SALT = 'NaCl NaHCO3 NH4ClO3 NaBr MgCl2'
-
-    # mandatory to have a hash_id instance
-    # TokenSecretAuth.set_hash_id_instance(@id_salt)
-
 
     # TokenSecretAuth.hash_id
     # returns the stored instance of Hashids
@@ -16,7 +13,7 @@ module TokenSecretAuth
       @hid
     end
 
-   # recommended configuration:
+    # recommended configuration:
     # TokenSecretAuth.configure do |config|
     #   config.id_salt = 'some appropriate saltiness'
     # end
@@ -25,6 +22,8 @@ module TokenSecretAuth
       @id_salt = DEFAULT_SALT if @id_salt.nil?
       set_hash_id_instance(@id_salt)
     end
+
+    # set salt for hashing IDs
     def id_salt=(salt)
       @id_salt = salt
     end
@@ -42,6 +41,8 @@ module TokenSecretAuth
       decoded = TokenSecretAuth.hash_id.decode(token).first
     end
 
+    # .find_with_token
+    # Use on model files to find a particular instance based on the token (hashed ID)
     def find_with_token(token)
       begin
         find(decode_token(token))
@@ -51,6 +52,8 @@ module TokenSecretAuth
       end
     end
 
+    # .authenticate_by_credentials
+    # finds correct instance by its token and then authenticates the password for that instance
     def authenticate_by_credentials(token, secret=nil)
       account = find_with_token(token)
       # note BCrypt's authenticate will return false or the object when matched
@@ -59,10 +62,12 @@ module TokenSecretAuth
       end
     end
 
+    # create a new randomly generated secret
     def generate_secret
       rand(36**secret_length).to_s(36)
     end
 
+    # the default length for a secret
     def secret_length
       @secret_length ||= 32
     end
@@ -75,7 +80,7 @@ module TokenSecretAuth
   end
 
 
-  # Returns the object's id attribute encoded
+  # Returns the object's ID attribute encoded as a token
   def token
     return nil if !id
     encode(id)
