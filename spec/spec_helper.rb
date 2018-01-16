@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "token_secret_auth"
+require 'pry'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

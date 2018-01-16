@@ -10,14 +10,6 @@ RSpec.describe TokenSecretAuth do
     Includer.new
   end
 
-  describe '#decode_token' do
-    let(:encoded) { Includer.new.send(:encode, 4002) }
-
-    it 'properly decodes the token' do
-      expect(includer.decode_token(encoded)).to eq 4002
-    end
-  end
-
   describe '#token' do
     let(:klass) do
       Struct.new(:id) do
@@ -27,7 +19,7 @@ RSpec.describe TokenSecretAuth do
     let(:test_object) { klass.new(123321) }
 
     it 'returns the id encoded' do
-      expect(test_object.token).to eq 'bRevJzqDJvyY'
+      expect(test_object.token).to eq 'koV3ZELzj0rg'
     end
   end
 
@@ -36,7 +28,7 @@ RSpec.describe TokenSecretAuth do
       expect(includer.generate_secret).to_not eq includer.generate_secret
     end
 
-    it 'generates a secret with length usually ~32' do
+    it 'generates a secret with length ~32' do
       keys = 10.times.map { includer.generate_secret.length }
       mean = keys.inject(0, :+) / 10
       # if this fails it's either a bug or your lucky day
@@ -45,12 +37,21 @@ RSpec.describe TokenSecretAuth do
   end
 
   describe 'ClassMethods' do
+
+    describe '.decode_token' do
+      let(:encoded) { Includer.new.send(:encode, 4002) }
+
+      it 'properly decodes the token' do
+        expect(Includer.decode_token(encoded)).to eq 4002
+      end
+    end
+
     describe '.generate_secret' do
       it 'generates a new secret' do
         expect(Includer.generate_secret).to_not eq Includer.generate_secret
       end
 
-      it 'generates a secret with length usually ~32' do
+      it 'generates a secret with length ~32' do
         keys = 10.times.map { Includer.generate_secret.length }
         mean = keys.inject(0, :+) / 10
         # if this fails it's either a bug or your lucky day
@@ -95,6 +96,16 @@ RSpec.describe TokenSecretAuth do
 
       it "returns false if the secret doesn't match" do
         expect(FriendlyFox.authenticate_by_credentials('lvrKqvNqR58a', 'asldkfjklj')).to eq false
+      end
+    end
+
+    describe 'configure' do
+      it "updates the hash_id instance using the new salt" do
+        current_hid = TokenSecretAuth.hash_id
+        TokenSecretAuth.configure do |config|
+          config.id_salt = 'lsdakjflksdjflksdjf'
+        end
+        expect(TokenSecretAuth.hash_id).to_not eq current_hid
       end
     end
   end
