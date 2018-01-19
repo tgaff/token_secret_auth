@@ -3,8 +3,12 @@ require "spec_helper"
 RSpec.describe TokenSecretAuth do
 
   class Includer
+    attr_reader :password
     include TokenSecretAuth
     def self.find(v); end
+    def password=(pw)
+      @password = pw # this is normally provided by Bcrypt
+    end
   end
   let(:includer) do
     Includer.new
@@ -23,7 +27,7 @@ RSpec.describe TokenSecretAuth do
     end
   end
 
-  describe 'generate_secret' do
+  describe '#generate_secret' do
     it 'generates a new secret' do
       expect(includer.generate_secret).to_not eq includer.generate_secret
     end
@@ -32,7 +36,11 @@ RSpec.describe TokenSecretAuth do
       keys = 10.times.map { includer.generate_secret.length }
       mean = keys.inject(0, :+) / 10
       # if this fails it's either a bug or your lucky day
-      expect(mean).to be_between(30,32)
+      expect(mean).to be_between(31,32)
+    end
+
+    it 'stores the secret as password' do
+      expect{includer.generate_secret}.to change{includer.password}.from(nil).to an_instance_of(String)
     end
   end
 
@@ -55,7 +63,7 @@ RSpec.describe TokenSecretAuth do
         keys = 10.times.map { Includer.generate_secret.length }
         mean = keys.inject(0, :+) / 10
         # if this fails it's either a bug or your lucky day
-        expect(mean).to be_between(30,32)
+        expect(mean).to be_between(31,32)
       end
     end
 

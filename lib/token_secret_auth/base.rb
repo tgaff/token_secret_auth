@@ -79,7 +79,6 @@ module TokenSecretAuth
     base.extend(ClassMethods)
   end
 
-
   # Returns the object's ID attribute encoded as a token
   def token
     return nil if !id
@@ -89,7 +88,7 @@ module TokenSecretAuth
   # the model can call this method to generate a new password for the user
   # it should then encrypt this password for storage in db
   def generate_secret
-    self.class.generate_secret
+    self.password = self.class.generate_secret
   end
 
 
