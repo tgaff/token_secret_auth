@@ -67,26 +67,28 @@ RSpec.describe TokenSecretAuth do
       end
     end
 
-    describe '.find_with_token' do
+    describe '.find_by_token' do
       it 'finds records by token' do
         expect(Includer).to receive(:find).with(42)
         token = TokenSecretAuth.hash_id.encode 42
-        Includer.find_with_token(token)
+        Includer.find_by_token(token)
       end
 
       it 'searches for nil if the token is invalid' do
         expect(Includer).to receive(:find).with(nil)
-        Includer.find_with_token('lvrKq----a')
+        Includer.find_by_token('lvrKq----a')
       end
     end
 
     describe '.authenticate_by_credentials' do
       class FriendlyFox
         include TokenSecretAuth
+        def id; 33; end
         def authenticate(secret) # mock for BCrypt authenticate
-          secret == 'secret' ? 'ok' : false
+          secret == 'secret' ? self : nil
         end
-        def self.find(x); end
+        #require 'pry'
+        #def self.find(x); binding.pry; end
       end
 
       let (:double_instance) do
@@ -94,16 +96,16 @@ RSpec.describe TokenSecretAuth do
       end
 
       before do
-        allow(FriendlyFox).to receive(:find_with_token).with('lvrKqvNqR58a')
-            .and_return(double_instance)
+        allow(FriendlyFox).to receive(:find).with(33)
+          .and_return(FriendlyFox.new)
       end
 
-      it 'finds the right record' do
-        expect(FriendlyFox.authenticate_by_credentials('lvrKqvNqR58a', 'secret')).to eq 'ok'
+      it 'finds the right record and returns it' do
+        expect(FriendlyFox.authenticate_by_credentials('NGKb0Y8nxmjo', 'secret')).to be_an_instance_of FriendlyFox
       end
 
-      it "returns false if the secret doesn't match" do
-        expect(FriendlyFox.authenticate_by_credentials('lvrKqvNqR58a', 'asldkfjklj')).to eq false
+      it "returns nil if the secret doesn't match" do # technically Bcrypt functionality
+        expect(FriendlyFox.authenticate_by_credentials('NGKb0Y8nxmjo', 'asldkfjklj')).to eq nil
       end
     end
 

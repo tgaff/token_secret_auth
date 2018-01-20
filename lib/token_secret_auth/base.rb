@@ -41,9 +41,9 @@ module TokenSecretAuth
       decoded = TokenSecretAuth.hash_id.decode(token).first
     end
 
-    # .find_with_token
+    # .find_by_token
     # Use on model files to find a particular instance based on the token (hashed ID)
-    def find_with_token(token)
+    def find_by_token(token)
       begin
         find(decode_token(token))
       rescue Hashids::InputError
@@ -55,7 +55,7 @@ module TokenSecretAuth
     # .authenticate_by_credentials
     # finds correct instance by its token and then authenticates the password for that instance
     def authenticate_by_credentials(token, secret=nil)
-      account = find_with_token(token)
+      account = find_by_token(token)
       # note BCrypt's authenticate will return false or the object when matched
       if account
         account.authenticate(secret)
