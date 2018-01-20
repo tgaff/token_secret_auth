@@ -1,4 +1,5 @@
 # TokenSecretAuth
+[![Build Status](https://travis-ci.org/tgaff/token_secret_auth.svg?branch=master)](https://travis-ci.org/tgaff/token_secret_auth)
 
 TokenSecretAuth aims to be a simple implementation of token+secret authentication.
 
