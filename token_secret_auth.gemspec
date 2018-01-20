@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["tgaff@alumni.nd.edu"]
 
   spec.summary       = %q{Simple token+secret authentication gem.}
-  spec.description   = %q{Simple token + secret authentication gem with encrypted secrets.}
+  spec.description   = %q{Simple token+secret authentication gem for use with has_secure_password for one-way encrypted secrets.}
   spec.homepage      = "https://github.com/tgaff/token_secret_auth"
   spec.license       = "MIT"
 
