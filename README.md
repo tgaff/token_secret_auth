@@ -122,7 +122,7 @@ def current_user
   begin
     api_client = ApiClient.authenticate_by_credentials(token, secret)
   rescue ActiveRecord::RecordNotFound
-  # if someone actually manages to guess a hash but it doesn't exist
+  # if someone sends a decodable token but the record doesn't exist
   end
 end
 
